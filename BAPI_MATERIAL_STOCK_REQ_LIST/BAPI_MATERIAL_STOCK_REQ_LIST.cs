@@ -16,6 +16,7 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
         protected override string FunName { get { return "BAPI_MATERIAL_STOCK_REQ_LIST"; } }
         public BAPI_MATERIAL_STOCK_REQ_LIST(SAP_RFC_ConnectBase conn) : base(conn) { }
 
+        #region const string
 
         public const string AVAIL_DATE = "AVAIL_DATE";
         public const string REC_REQD_QTY = "REC_REQD_QTY";
@@ -27,8 +28,10 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
         public const string MRP_IND_LINES = "MRP_IND_LINES";
         public const string MRP_ITEMS = "MRP_ITEMS";
 
+        #endregion
+
         /// <summary>
-        /// 查需求
+        /// Func原始格式，包含所有參數
         /// </summary>
         /// <param name="MATERIAL"></param>
         /// <param name="PLANT"></param>
@@ -54,28 +57,30 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
             DataSet ds = new DataSet();
             IRfcFunction rfcFunction = GetRfcFunction(FunName);
 
-            MATERIAL = MaterialProcess(MATERIAL);
+            #region Import parameters
 
-            rfcFunction.SetValue("MATERIAL", MATERIAL);
+            rfcFunction.SetValue("MATERIAL", MaterialProcess(MATERIAL));
             rfcFunction.SetValue("PLANT", PLANT);
             rfcFunction.SetValue("MRP_AREA", MRP_AREA);
             rfcFunction.SetValue("PLAN_SCENARIO", PLAN_SCENARIO);
             rfcFunction.SetValue("SELECTION_RULE", SELECTION_RULE);
             rfcFunction.SetValue("DISPLAY_FILTER", DISPLAY_FILTER);
+            rfcFunction.SetValue("PERIOD_INDICATOR", PERIOD_INDICATOR ? "X" : "");
+            rfcFunction.SetValue("GET_ITEM_DETAILS", GET_ITEM_DETAILS ? "X" : "");
+            rfcFunction.SetValue("GET_IND_LINES", GET_IND_LINES ? "X" : "");
+            rfcFunction.SetValue("GET_TOTAL_LINES", GET_TOTAL_LINES ? "X" : "");
+            rfcFunction.SetValue("IGNORE_BUFFER", IGNORE_BUFFER ? "X" : "");
 
             IRfcStructure MATERIAL_EVG = rfcFunction.GetStructure("MATERIAL_EVG");
             MATERIAL_EVG.SetValue("MATERIAL_EXT", MATERIAL_EVG_MATERIAL_EXT);
             MATERIAL_EVG.SetValue("MATERIAL_VERS", MATERIAL_EVG_MATERIAL_VERS);
             MATERIAL_EVG.SetValue("MATERIAL_GUID", MATERIAL_EVG_MATERIAL_GUID);
 
-            rfcFunction.SetValue("PERIOD_INDICATOR", PERIOD_INDICATOR ? "X" : "");
-            rfcFunction.SetValue("GET_ITEM_DETAILS", GET_ITEM_DETAILS ? "X" : "");
-            rfcFunction.SetValue("GET_TOTAL_LINES", GET_TOTAL_LINES ? "X" : "");
-            rfcFunction.SetValue("IGNORE_BUFFER", IGNORE_BUFFER ? "X" : "");
-            rfcFunction.SetValue("GET_IND_LINES", GET_IND_LINES ? "X" : "");
-
+            #endregion
 
             rfcFunction.Invoke(Destination);
+
+            #region Export parpmeters
 
             #region MRP_LIST
             {
@@ -118,6 +123,10 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
             }
             #endregion
 
+            #endregion
+
+            #region Tables
+
             #region MRP_ITEMS
             {
                 string tableName = "MRP_ITEMS";
@@ -159,8 +168,22 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
             }
             #endregion
 
+            #endregion
+
             return ds;
         }
+
+        /// <summary>
+        /// 縮減參數
+        /// </summary>
+        /// <param name="MATERIAL"></param>
+        /// <param name="PLANT"></param>
+        /// <param name="PERIOD_INDICATOR"></param>
+        /// <param name="GET_ITEM_DETAILS"></param>
+        /// <param name="GET_IND_LINES"></param>
+        /// <param name="GET_TOTAL_LINES"></param>
+        /// <param name="IGNORE_BUFFER"></param>
+        /// <returns></returns>
         public DataSet Send(string MATERIAL, string PLANT,
             bool PERIOD_INDICATOR, bool GET_ITEM_DETAILS, bool GET_IND_LINES, bool GET_TOTAL_LINES, bool IGNORE_BUFFER)
         {
