@@ -25,6 +25,8 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
         public const string ELEMNT_DATA = "ELEMNT_DATA";
         public const string PLAN_PLANT2 = "PLAN_PLANT2";
         public const string MRP_NO12 = "MRP_NO12";
+
+        //輸出表格名稱
         public const string MRP_IND_LINES = "MRP_IND_LINES";
         public const string MRP_ITEMS = "MRP_ITEMS";
 
@@ -59,17 +61,19 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
 
             #region Import parameters
 
+            const string flagX = "X";
+
             rfcFunction.SetValue("MATERIAL", MaterialProcess(MATERIAL));
             rfcFunction.SetValue("PLANT", PLANT);
             rfcFunction.SetValue("MRP_AREA", MRP_AREA);
             rfcFunction.SetValue("PLAN_SCENARIO", PLAN_SCENARIO);
             rfcFunction.SetValue("SELECTION_RULE", SELECTION_RULE);
             rfcFunction.SetValue("DISPLAY_FILTER", DISPLAY_FILTER);
-            rfcFunction.SetValue("PERIOD_INDICATOR", PERIOD_INDICATOR ? "X" : "");
-            rfcFunction.SetValue("GET_ITEM_DETAILS", GET_ITEM_DETAILS ? "X" : "");
-            rfcFunction.SetValue("GET_IND_LINES", GET_IND_LINES ? "X" : "");
-            rfcFunction.SetValue("GET_TOTAL_LINES", GET_TOTAL_LINES ? "X" : "");
-            rfcFunction.SetValue("IGNORE_BUFFER", IGNORE_BUFFER ? "X" : "");
+            rfcFunction.SetValue("PERIOD_INDICATOR", PERIOD_INDICATOR ? flagX : string.Empty);
+            rfcFunction.SetValue("GET_ITEM_DETAILS", GET_ITEM_DETAILS ? flagX : string.Empty);
+            rfcFunction.SetValue("GET_IND_LINES", GET_IND_LINES ? flagX : string.Empty);
+            rfcFunction.SetValue("GET_TOTAL_LINES", GET_TOTAL_LINES ? flagX : string.Empty);
+            rfcFunction.SetValue("IGNORE_BUFFER", IGNORE_BUFFER ? flagX : string.Empty);
 
             IRfcStructure MATERIAL_EVG = rfcFunction.GetStructure("MATERIAL_EVG");
             MATERIAL_EVG.SetValue("MATERIAL_EXT", MATERIAL_EVG_MATERIAL_EXT);
@@ -172,6 +176,84 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
 
             return ds;
         }
+
+
+        /// <summary>
+        /// 需求查詢-仿照MD04方式
+        /// </summary>
+        /// <param name="material_no"></param>
+        /// <param name="plant"></param>
+        /// <param name="mrp_area"></param>
+        /// <returns></returns>
+        public DataTable Query_Like_MD04(string material_no, string plant,string mrp_area = "")
+        {
+            DataTable dataTable = new DataTable();
+            dataTable.Columns.Add("Date");
+            dataTable.Columns.Add("MRP element");
+            dataTable.Columns.Add("MRP element data");
+            dataTable.Columns.Add("Exception");
+            dataTable.Columns.Add("Receipt/Reqmt");
+            dataTable.Columns.Add("Available Qty");
+            dataTable.Columns.Add("Storage Location");
+
+            dataTable.Columns.Add("ProdOrder");
+
+            string MATERIAL = material_no;
+            string PLANT = plant;
+            string MRP_AREA = mrp_area;
+            string PLAN_SCENARIO = string.Empty;
+            string SELECTION_RULE = string.Empty;
+            string DISPLAY_FILTER = string.Empty;
+            string MATERIAL_EVG_MATERIAL_EXT = string.Empty;
+            string MATERIAL_EVG_MATERIAL_VERS = string.Empty;
+            string MATERIAL_EVG_MATERIAL_GUID = string.Empty;
+
+            bool PERIOD_INDICATOR = false;
+            bool GET_ITEM_DETAILS = true;
+            bool GET_IND_LINES = true;
+            bool GET_TOTAL_LINES = false;
+            bool IGNORE_BUFFER = false;
+
+            DataSet dataSet = Send(
+                MATERIAL, PLANT, MRP_AREA, PLAN_SCENARIO, SELECTION_RULE, DISPLAY_FILTER, MATERIAL_EVG_MATERIAL_EXT, MATERIAL_EVG_MATERIAL_VERS,
+                MATERIAL_EVG_MATERIAL_GUID, PERIOD_INDICATOR, GET_ITEM_DETAILS, GET_IND_LINES, GET_TOTAL_LINES, IGNORE_BUFFER);
+
+            //const string MRP_IND_LINES = "MRP_IND_LINES";
+            //const string MRP_ITEMS = "MRP_ITEMS";
+
+            DataTable dataTable_MRP_IND_LINES = dataSet.Tables[MRP_IND_LINES];
+            DataTable dataTable_MRP_ITEMS = dataSet.Tables[MRP_ITEMS];
+
+            for (int i = 0; i < dataTable_MRP_IND_LINES.Rows.Count; i++)
+            {
+                DataRow row_MRP_IND_LINES = dataTable_MRP_IND_LINES.Rows[i];
+                string Date = row_MRP_IND_LINES["AVAIL_DATE"].ToString();
+                string MRP_element = row_MRP_IND_LINES["MRP_ELEMNT"].ToString();
+                string MRP_element_data = row_MRP_IND_LINES["ELEMNT_DATA"].ToString();
+                string Exception = row_MRP_IND_LINES["EXCMESSAGE"].ToString();
+                string Receipt_Reqmt = row_MRP_IND_LINES["REC_REQD_QTY"].ToString();
+                string Available_Qty = row_MRP_IND_LINES["AVAIL_QTY1"].ToString();
+                string Storage_Location = row_MRP_IND_LINES["STORAGE_LOC"].ToString();
+
+                DataRow row_MRP_ITEMS = dataTable_MRP_ITEMS.Rows[i];
+                string ProdOrder = row_MRP_ITEMS["MRP_NO12"].ToString();
+
+                dataTable.Rows.Add(
+                    Date,
+                    MRP_element,
+                    MRP_element_data,
+                    Exception,
+                    Receipt_Reqmt,
+                    Available_Qty,
+                    Storage_Location,
+
+                    ProdOrder
+                    );
+            }
+
+            return dataTable;
+        }
+
 
         /// <summary>
         /// 縮減參數
@@ -297,5 +379,6 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
 
             return resDT;
         }
+
     }
 }
