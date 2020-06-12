@@ -188,6 +188,7 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
         public DataTable Query_Like_MD04(string material_no, string plant,string mrp_area = "")
         {
             DataTable dataTable = new DataTable();
+            dataTable.Columns.Add("Material NO");
             dataTable.Columns.Add("Date");
             dataTable.Columns.Add("MRP element");
             dataTable.Columns.Add("MRP element data");
@@ -239,6 +240,7 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
                 string ProdOrder = row_MRP_ITEMS["MRP_NO12"].ToString();
 
                 dataTable.Rows.Add(
+                    material_no,
                     Date,
                     MRP_element,
                     MRP_element_data,
