@@ -236,7 +236,10 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
                 string Available_Qty = row_MRP_IND_LINES["AVAIL_QTY1"].ToString();
                 string Storage_Location = row_MRP_IND_LINES["STORAGE_LOC"].ToString();
 
-                DataRow row_MRP_ITEMS = dataTable_MRP_ITEMS.Rows[i];
+                //對應dataTable_MRP_ITEMS的index
+                int Int_Table_Ind1 = int.Parse(row_MRP_IND_LINES["INT_TABLE_IND1"].ToString());
+
+                DataRow row_MRP_ITEMS = dataTable_MRP_ITEMS.Rows[Int_Table_Ind1 - 1];
                 string ProdOrder = row_MRP_ITEMS["MRP_NO12"].ToString();
 
                 dataTable.Rows.Add(
