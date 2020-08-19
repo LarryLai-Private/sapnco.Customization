@@ -13,22 +13,22 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
     /// </summary>
     public class BAPI_MATERIAL_STOCK_REQ_LIST : RFC_FunctionBase
     {
-        protected override string FunName { get { return "BAPI_MATERIAL_STOCK_REQ_LIST"; } }
+        protected override string FunName => "BAPI_MATERIAL_STOCK_REQ_LIST"; 
         public BAPI_MATERIAL_STOCK_REQ_LIST(SAP_RFC_ConnectBase conn) : base(conn) { }
 
         #region const string
 
-        public const string AVAIL_DATE = "AVAIL_DATE";
-        public const string REC_REQD_QTY = "REC_REQD_QTY";
-        public const string MRP_ELEMNT = "MRP_ELEMNT";
-        public const string MRP_ELEMENT_IND = "MRP_ELEMENT_IND";
-        public const string ELEMNT_DATA = "ELEMNT_DATA";
-        public const string PLAN_PLANT2 = "PLAN_PLANT2";
-        public const string MRP_NO12 = "MRP_NO12";
+        static public string AVAIL_DATE => "AVAIL_DATE";
+        static public string REC_REQD_QTY => "REC_REQD_QTY";
+        static public string MRP_ELEMNT => "MRP_ELEMNT";
+        static public string MRP_ELEMENT_IND => "MRP_ELEMENT_IND";
+        static public string ELEMNT_DATA => "ELEMNT_DATA";
+        static public string PLAN_PLANT2 => "PLAN_PLANT2";
+        static public string MRP_NO12 => "MRP_NO12";
 
         //輸出表格名稱
-        public const string MRP_IND_LINES = "MRP_IND_LINES";
-        public const string MRP_ITEMS = "MRP_ITEMS";
+        static public string MRP_IND_LINES => "MRP_IND_LINES";
+        static public string MRP_ITEMS => "MRP_ITEMS";
 
         #endregion
 
@@ -133,7 +133,7 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
 
             #region MRP_ITEMS
             {
-                string tableName = "MRP_ITEMS";
+                string tableName = MRP_ITEMS;
                 IRfcFunction iRfcFunction = rfcFunction;
                 DataSet dataSet = ds;
 
@@ -143,7 +143,7 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
             #endregion
             #region MRP_IND_LINES
             {
-                string tableName = "MRP_IND_LINES";
+                string tableName = MRP_IND_LINES;
                 IRfcFunction iRfcFunction = rfcFunction;
                 DataSet dataSet = ds;
 
@@ -177,6 +177,19 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
             return ds;
         }
 
+        public class MD04_Columns
+        {
+            static public string Material_NO => "Material NO";
+
+            static public string Date => "Date";
+            static public string MRP_element => "MRP element";
+            static public string MRP_element_data => "MRP element data";
+            static public string Exception => "Exception";
+            static public string Receipt_Reqmt => "Receipt/Reqmt";
+            static public string Available_Qty => "Available Qty";
+            static public string Storage_Location => "Storage Location";
+            static public string ProdOrder => "ProdOrder";
+        }
 
         /// <summary>
         /// 需求查詢-仿照MD04方式
@@ -188,16 +201,16 @@ namespace sapnco.Customization.BAPI_MATERIAL_STOCK_REQ_LIST
         public DataTable Query_Like_MD04(string material_no, string plant,string mrp_area = "")
         {
             DataTable dataTable = new DataTable();
-            dataTable.Columns.Add("Material NO");
-            dataTable.Columns.Add("Date");
-            dataTable.Columns.Add("MRP element");
-            dataTable.Columns.Add("MRP element data");
-            dataTable.Columns.Add("Exception");
-            dataTable.Columns.Add("Receipt/Reqmt");
-            dataTable.Columns.Add("Available Qty");
-            dataTable.Columns.Add("Storage Location");
+            dataTable.Columns.Add(MD04_Columns.Material_NO);
+            dataTable.Columns.Add(MD04_Columns.Date);
+            dataTable.Columns.Add(MD04_Columns.MRP_element);
+            dataTable.Columns.Add(MD04_Columns.MRP_element_data);
+            dataTable.Columns.Add(MD04_Columns.Exception);
+            dataTable.Columns.Add(MD04_Columns.Receipt_Reqmt);
+            dataTable.Columns.Add(MD04_Columns.Available_Qty);
+            dataTable.Columns.Add(MD04_Columns.Storage_Location);
 
-            dataTable.Columns.Add("ProdOrder");
+            dataTable.Columns.Add(MD04_Columns.ProdOrder);
 
             string MATERIAL = material_no;
             string PLANT = plant;
