@@ -191,35 +191,19 @@ namespace sapnco.Customization
     abstract public class RFC_FunctionBase
     {
         SAP_RFC_ConnectBase connect;
-        protected RfcDestination Destination
-        {
-            get
-            {
-                return connect.GetDestination();
-            }
-        }
         public RFC_FunctionBase(SAP_RFC_ConnectBase conn)
         {
             connect = conn;
         }
-
         abstract protected string FunName { get; }
-        protected IRfcFunction RfcFunction
-        {
-            get
-            {
-                return Destination.Repository.CreateFunction(FunName);
-            }
-        }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="func"></param>
-        /// <returns></returns>
-        protected IRfcFunction GetRfcFunction(string func)
-        {
-            return Destination.Repository.CreateFunction(func);
-        }
+
+        protected RfcDestination Destination => connect.GetDestination();
+        protected RfcRepository Repository => Destination.Repository;
+        protected IRfcFunction GetRfcFunction(string FunName) => Repository.CreateFunction(FunName);
+        protected IRfcFunction RfcFunction => GetRfcFunction(FunName);
+
+
+
 
         /// <summary>
         /// 處理純數字左側須補滿0
@@ -246,7 +230,6 @@ namespace sapnco.Customization
 
             return value.ToUpper();
         }
-
         /// <summary>
         /// 處理料號參數
         /// </summary>
@@ -259,15 +242,6 @@ namespace sapnco.Customization
 
         #region RfcTable to DataTable
 
-        protected void RfcStructureToDataRow(IRfcStructure rfcStructure, ref DataRow row)
-        {
-            for (int i = 0; i < rfcStructure.ElementCount; i++)
-            {
-                RfcElementMetadata Metadata = rfcStructure.GetElementMetadata(i);
-                row[Metadata.Name] = rfcStructure.GetString(Metadata.Name).Trim();
-            }
-        }
-
         protected DataTable CreateDataTableFromRfcData(IRfcDataContainer rfcData, string tableName = null)
         {
             DataTable dataTable = new DataTable();
@@ -278,6 +252,25 @@ namespace sapnco.Customization
                 RfcElementMetadata Metadata = rfcData.GetElementMetadata(i);
                 dataTable.Columns.Add(Metadata.Name);
             }
+            return dataTable;
+        }
+        protected void RfcStructureToDataRow(IRfcStructure rfcStructure, ref DataRow row)
+        {
+            for (int i = 0; i < rfcStructure.ElementCount; i++)
+            {
+                RfcElementMetadata Metadata = rfcStructure.GetElementMetadata(i);
+                row[Metadata.Name] = rfcStructure.GetString(Metadata.Name).Trim();
+            }
+        }
+        protected DataTable RfcStructureToDataTable(IRfcStructure rfcStructure, string tableName = null)
+        {
+            DataTable dataTable = CreateDataTableFromRfcData(rfcStructure, tableName);
+
+            //取得列中每欄資料                
+            DataRow row = dataTable.NewRow();
+            RfcStructureToDataRow(rfcStructure, ref row);
+            dataTable.Rows.Add(row);
+
             return dataTable;
         }
         protected DataTable RfcTableToDataTable(IRfcTable rfcTable, string tableName = null)
@@ -294,21 +287,11 @@ namespace sapnco.Customization
 
             return dataTable;
         }
-        protected DataTable RfcStructureToDataTable(IRfcStructure rfcStructure, string tableName = null)
-        {
-            DataTable dataTable = CreateDataTableFromRfcData(rfcStructure, tableName);
 
-            //取得列中每欄資料                
-            DataRow row = dataTable.NewRow();
-            RfcStructureToDataRow(rfcStructure, ref row);
-            dataTable.Rows.Add(row);
-
-            return dataTable;
-        }
-        protected DataTable GetFunctionStructureToDataTable(ref IRfcFunction iRfcFunction, string tableName)
+        protected DataTable GetFunctionStructureToDataTable(ref IRfcFunction iRfcFunction, string name)
         {
-            IRfcStructure iRfcStructure = iRfcFunction.GetStructure(tableName);
-            return RfcStructureToDataTable(iRfcStructure, tableName);
+            IRfcStructure iRfcStructure = iRfcFunction.GetStructure(name);
+            return RfcStructureToDataTable(iRfcStructure, name);
         }
         protected DataTable GetFunctionTableToDataTable(ref IRfcFunction iRfcFunction, string tableName)
         {
