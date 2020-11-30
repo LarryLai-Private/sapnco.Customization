@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="sapnco.dll" />
+    <None Remove="sapnco_utils.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="sapnco.dll" />
+    <Content Include="sapnco_utils.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="sapnco">
+      <HintPath>sapnco.dll</HintPath>
+    </Reference>
+    <Reference Include="sapnco_utils">
+      <HintPath>sapnco_utils.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
