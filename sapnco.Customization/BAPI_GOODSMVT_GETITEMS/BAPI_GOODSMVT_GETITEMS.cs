@@ -1,13 +1,8 @@
-﻿using System;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Collections.Generic;
+﻿using System.Data;
 
 using SAP.Middleware.Connector;
 
 using static sapnco.Customization.BAPI_GOODSMVT_GETITEMS.BAPI_GOODSMVT_GETITEMS.ReturnTables;
-using static sapnco.Customization.BAPI_GOODSMVT_GETITEMS.BAPI_GOODSMVT_GETITEMS.ReturnTables.SharedFields;
 
 namespace sapnco.Customization.BAPI_GOODSMVT_GETITEMS
 {
